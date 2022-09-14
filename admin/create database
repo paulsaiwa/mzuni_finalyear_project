@@ -1,0 +1,86 @@
+create database
+CREATE TABLE `login` (
+  `id` int(11) NOT NULL,
+  `userName` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+user log
+
+CREATE TABLE `userlog` (
+  `id` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `userIp` varbinary(16) NOT NULL,
+  `loginTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+config.php
+<?php
+define('DB_SERVER','localhost');
+define('DB_USER','root');
+define('DB_PASS' ,'');
+define('DB_NAME', 'demos');
+$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASS,DB_NAME);
+// Check connection
+if (mysqli_connect_errno())
+{
+ echo "Failed to connect to MySQL: " . mysqli_connect_error();
+}
+?>
+
+
+html.php form
+
+<form name="login" method="post" >
+  <header>Login</header>
+  <p style="color:red;"><?php echo $_SESSION['msg'];?><?php echo $_SESSION['msg']="";?></p>
+  <label>Username <span>*</span></label>
+  <input name="username" type="text" value="" required />
+  <label>Password <span>*</span></label>
+  <input name="password" type="password" value="" required />
+  <button type="submit" name="login">Login</button>
+</form>
+
+index.php
+
+<?php
+session_start();
+include 'config.php';
+if(isset($_POST['login']))
+{
+$username=$_POST['username']; // Get username
+$password=$_POST['password']; // get password
+//query for match the user inputs
+$ret=mysqli_query($con,"SELECT * FROM login WHERE userName='$username' and password='$password'");
+$num=mysqli_fetch_array($ret);
+// if user inputs match if condition will runn
+if($num>0)
+{
+$_SESSION['login']=$username; // hold the user name in session
+$_SESSION['id']=$num['id']; // hold the user id in session
+$uip=$_SERVER['REMOTE_ADDR']; // get the user ip
+$action="Login";// query for inser user log in to data base
+mysqli_query($con,"insert into userlog(userId,username,userIp,action) values('".$_SESSION['id']."','".$_SESSION['login']."','$uip','$action')")
+// code redirect the page after login
+$extra="welcome.php";
+$host=$_SERVER['HTTP_HOST'];
+$uri=rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
+header("location:http://$host$uri/$extra");
+exit();
+}
+// If the userinput no matched with database else condition will run
+else
+{
+$_SESSION['msg']="Invalid username or password";
+$extra="index.php";
+$host = $_SERVER['HTTP_HOST'];
+$uri = rtrim(dirname($_SERVER['PHP_SELF']),'/\\');
+header("location:http://$host$uri/$extra");
+exit();
+ }
+}
+?>
