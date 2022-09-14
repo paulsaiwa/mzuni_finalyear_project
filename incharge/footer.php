@@ -1,0 +1,1 @@
+<?php echo "<label class='w3-left w3-hover-green' style=' margin-left:10px; font-size:20px;color:lightblue;text-shadow:7px 7px 4px #000000;''>saiwavincent@gmail.com</label>"." <label class='w3-right w3-hover-green' style='font-size:20px;color:lightblue;text-shadow:7px 7px 4px #000000;''>&copy;"."Hospital Improvement Monitoring System".date('Y', strtotime('+8 HOURS'))."</label>"?>
